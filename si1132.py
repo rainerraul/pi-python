@@ -150,31 +150,57 @@ with twi.I2CMaster() as twibus :
 		return i2c_read(IRSTA) & 0x21
 
 	def read_sensor_data(senstype) :
+		multi = 1
+		
 		if(senstype == VIS) :
 			comm = VIDAT
 		elif(senstype == IR) :
 			comm = IRDAT
+			set_ir_range()
+			multi = 14.5
 		elif(senstype == UV) :
 			comm = UVDAT
 
-		for i in range(4) :	
-			i2c_write(UCOEF[i], UCOVAL[i])
+			for i in range(4) :	
+				i2c_write(UCOEF[i], UCOVAL[i])
 
 		sensdata = i2c_read_more(comm[0], 2)
 		sensword = ((sensdata[0][1] << 8) | sensdata[0][0])
 		
 		if(senstype != UV) :
 			sensword -= 256
-			sensword *= 10
-		if(sensword < 0) :
-			sensword = 0
-		return sensword		
+			if(sensword < 0) :
+				sensword = 0
+		elif(senstype == UV) :
+			sensword /= 1450
+
+		return sensword * multi		
 
 	def chip_state() :
 		state = i2c_read(CHSTAT) & 0x07
 		return state
 
 #ram command functions
+	def set_ir_range() :
+		state = ram_command_write(WR_IRMISC, 0x20)
+		state = ram_command_read(RD_IRMISC)
+		return state
+
+	def set_vis_range() :
+		state = ram_command_write(WR_VISMISC, 0x20)
+		state = ram_command_read(RD_VISMISC)
+		return state
+
+	def reset_ir_range() :
+		state = ram_command_write(WR_IRMISC, 0x00)
+		state = ram_command_read(RD_IRMISC)
+		return state
+
+	def reset_vis_range() :
+		state = ram_command_write(WR_VISMISC, 0x00)
+		state = ram_command_read(RD_VISMISC)
+		return state
+
 	def set_als_mode(mode) :
 		state = ram_command_write(mode, -1)
 		state = ram_command_read(mode)
@@ -207,5 +233,5 @@ with twi.I2CMaster() as twibus :
 
 
 	while True :
-		print("Visual value: %6i  Infrared value: %6i UV %3i" % (read_sensor_data(VIS), read_sensor_data(IR), read_sensor_data(UV)))
+		print("Visual value: %6i  Infrared value: %6i UV-Index: %3.1f" % (read_sensor_data(VIS), read_sensor_data(IR), read_sensor_data(UV)))
 		time.sleep(1)
