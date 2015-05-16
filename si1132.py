@@ -101,8 +101,9 @@ with twi.I2CMaster() as twibus :
 	
 		if((rd_ram_register & QUERY) == QUERY) :	
 			ram_value = i2c_read(PARAR)
-		
-		return ram_value
+			return ram_value
+
+                return rsp
 
 #i2c command functions
 	def get_part_id() :
