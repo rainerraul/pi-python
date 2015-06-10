@@ -3,3 +3,7 @@ I had bought this Odroid-Weatherboard by a german distributor. The compact dimen
 (14 05 2015)<br>
 The programming of these sensors on the weatherboard are complete. The next thing what i will do is to create a graphical interface for websites in php, a table output and some search routines.
 to be continued...
+(10 06 2015)<br>
+Added a python-script called lcdprint. You can send a message to a twi-interfaced YuroBot display 4x20.
+open a ssh-shell and type: <font color=red>lcdprint linenumber(0-3) "Hello Message"</font>. Use this python-file to display data from
+sensor devices, that are connected on the same i2c bus, where the LCD-Display is.
