@@ -5,5 +5,5 @@ The programming of these sensors on the weatherboard are complete. The next thin
 to be continued...<br>
 (10 06 2015)<br>
 Added a python-script called lcdprint. You can send a message to a twi-interfaced YuroBot display 4x20.
-open a ssh-shell and type: <b><p style="font-color:red">lcdprint linenumber(0-3) "Hello Message".</p></b> Use this python-file to display data from
+open a ssh-shell and type: <center><b><p style="font-color:red">lcdprint linenumber(0-3) "Hello Message".</p></b></center> Use this python-file to display data from
 sensor devices, that are connected on the same i2c bus, where the LCD-Display is.
