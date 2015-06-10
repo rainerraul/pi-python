@@ -1,0 +1,108 @@
+#!/usr/bin/python3
+
+import quick2wire.i2c as twi_8574
+import time, os, sys
+
+pcf8574Addr = 0x27
+rs = 0x01; rw = 0x02; e = 0x04; led = 0x08
+pcf8574byte = 0x00
+
+with twi_8574.I2CMaster() as bus :
+	try :	
+		def i2cwrite(outdata) :
+			bus.transaction(twi_8574.writing_bytes(pcf8574Addr, outdata))
+
+		def command_mode(opcode) :
+			pcf8574byte = 0
+			i2cwrite(pcf8574byte | led)
+			pcf8574byte = opcode & 0xf0
+			i2cwrite(pcf8574byte | led | e)
+			time.sleep(0.000000017)
+			pcf8574byte = 0
+			i2cwrite(pcf8574byte | led)
+
+			pcf8574byte = 0
+			i2cwrite(pcf8574byte | led)
+			pcf8574byte = (opcode & 0x0f) << 4
+			i2cwrite(pcf8574byte | led | e)
+			time.sleep(0.000000017)
+			pcf8574byte = 0
+			i2cwrite(pcf8574byte | led)
+		
+		def write_mode(lcddata) :
+			pcf8574byte = 0
+			i2cwrite(pcf8574byte | led)
+			pcf8574byte = 0
+			pcf8574byte = lcddata & 0xf0
+			i2cwrite(pcf8574byte | led | e | rs)
+			time.sleep(0.000000017)
+			pcf8574byte = 0
+			i2cwrite(pcf8574byte | led)
+
+			pcf8574byte = 0
+			i2cwrite(pcf8574byte | led)
+			pcf8574byte = (lcddata & 0x0f) << 4
+			i2cwrite(pcf8574byte | led | e | rs)
+			time.sleep(0.000000017)
+			pcf8574byte = 0
+			i2cwrite(pcf8574byte | led)
+
+        
+		def lcd_init() :
+			command_mode(0x03)
+			time.sleep(0.0045)
+			command_mode(0x03)
+			time.sleep(0.0045)
+			command_mode(0x03)
+			time.sleep(0.00015)
+			command_mode(0x02)
+			time.sleep(0.1)
+			command_mode(0x02)
+			time.sleep(0.1)
+			command_mode(0x0f)
+			time.sleep(0.1)
+			command_mode(0x40)
+			time.sleep(0.1)
+			command_mode(0x80)
+			time.sleep(0.1)
+
+
+		def lcd_print(y, lcdstr) :
+
+			if(y == 0) :
+				command_mode(0x80)
+			elif(y == 1) :
+				command_mode(0xa8)
+			elif(y == 2) :
+				command_mode(0x94)
+			elif(y == 3) :
+				command_mode(0xd4)
+
+			for a in range(0, len(lcdstr)) :
+
+				if(a == 20) :
+					command_mode(0xa8)
+				elif(a == 40) :
+					command_mode(0x94)
+				elif(a == 60) :
+					command_mode(0xd4)
+
+				lcdchar = ord(lcdstr[a : a + 1])
+				write_mode(lcdchar)
+
+		def lcd_clear() :
+			command_mode(0x02)
+			command_mode(0x80)
+			command_mode(0x01)
+	
+			for a in range(80) :
+				write_mode(0x20)
+
+		lcd_init()
+		lcd_clear()
+		lcd_print(int(sys.argv[1]), sys.argv[2])
+
+	except IndexError :
+		print("Please type in linenumber and string!!")
+		print("Example: lcdprint linnumber(0-3) String")
+		pass
