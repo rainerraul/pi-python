@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+##!/usr/bin/python3
 
 import quick2wire.i2c as twowire
 import sys, math, os, time
@@ -154,9 +154,20 @@ with twowire.I2CMaster() as bussystem :
 		p = p + int((X1 + X2 + 3791) / (2 ** 4))
 		return int(p)
 
-	bmp180_writeParams_toFile()
+	def write_data_to(file = "") :
 
-	press = bmp180_readPressure(conversion_13m5)
-	print(press)
-	temp = bmp180_readTemp()
-	print(temp[0])
+		timestamp = time.asctime(time.localtime(time.time()))
+
+		if(file != "") :
+			filehandle = open(file, "a")
+			filehandle.write("time-%s-temp-%s-pressure-%s\r\n" %(timestamp, 
+			bmp180_readTemp()[0], bmp180_readPressure(conversion_13m5)))
+			filehandle.close()
+
+		else :
+			print("Temperatur: %3.1f-Pressure: %6.1f" %(bmp180_readTemp(), 
+			bmp180_readPressure(conversion_13m5)))
+
+	bmp180_writeParams_toFile()
+	write_data_to("/var/www/wetter/bmp180.dat")
+
