@@ -108,7 +108,7 @@ with twi_8574.I2CMaster() as bus :
 	except IndexError :
 		if(int(sys.argv[1]) != -1) :
 			print("Please type in linenumber and string!!")
-			print("Example: lcdprint linnumber(0-3) String")
+			print("Example: lcdprint line number(0-3) String")
 		else :
 			print("content deleted!!")
 		pass
