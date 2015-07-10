@@ -4,6 +4,7 @@ import quick2wire.i2c as twi
 import os, math, time
 
 slave = 0x60
+interval = 1
 
 #i2c command table
 PARTID = 0x00;         UCOEF = [0x13, 0x14, 0x15, 0x16]
@@ -102,8 +103,8 @@ with twi.I2CMaster() as twibus :
 		if((rd_ram_register & QUERY) == QUERY) :	
 			ram_value = i2c_read(PARAR)
 			return ram_value
-
-                return rsp
+		
+		return rsp
 
 #i2c command functions
 	def get_part_id() :
@@ -230,9 +231,27 @@ with twi.I2CMaster() as twibus :
 		irda_gain(0x00)
 		set_als_mode(ALSAUTO)		
 	
+
+#tool to store data in files per timestamp
+	def write_data_to(file = "") :
+
+		timestamp = time.asctime(time.localtime(time.time()))
+
+		if(file != "") :
+			filehandle = open(file, "a")
+			filehandle.write("time-%s-VIS-%6i-IR-%6i-UV-%3.1f\r\n" % (timestamp, 
+                                                                      read_sensor_data(VIS),
+			                                              read_sensor_data(IR),
+                                                                      read_sensor_data(UV)))
+			filehandle.close()
+
+		else :
+			print("Visual value: %6ilux Infrared value: %6ilux UV-Index: %3.1f" % 
+                                                                      (read_sensor_data(VIS), 
+                                                                       read_sensor_data(IR), 
+                                                                       read_sensor_data(UV)))
+
+
 	init_sensor()
-
-
-	while True :
-		print("Visual value: %6i  Infrared value: %6i UV-Index: %3.1f" % (read_sensor_data(VIS), read_sensor_data(IR), read_sensor_data(UV)))
-		time.sleep(1)
+	time.sleep(1)
+	write_data_to("/var/www/wetter/si1132.dat")
