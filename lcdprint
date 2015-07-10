@@ -1,8 +1,8 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
 import quick2wire.i2c as twi_8574
 import time, os, sys
-
 pcf8574Addr = 0x27
 rs = 0x01; rw = 0x02; e = 0x04; led = 0x08
 pcf8574byte = 0x00
@@ -99,10 +99,16 @@ with twi_8574.I2CMaster() as bus :
 				write_mode(0x20)
 
 		lcd_init()
-		lcd_clear()
+		
+		if(int(sys.argv[1]) == -1) :
+			lcd_clear()
+		
 		lcd_print(int(sys.argv[1]), sys.argv[2])
 
 	except IndexError :
-		print("Please type in linenumber and string!!")
-		print("Example: lcdprint linenumber(0-3) 'Hello World'")
+		if(int(sys.argv[1]) != -1) :
+			print("Please type in linenumber and string!!")
+			print("Example: lcdprint linnumber(0-3) String")
+		else :
+			print("content deleted!!")
 		pass
