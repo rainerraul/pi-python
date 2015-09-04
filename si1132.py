@@ -156,9 +156,9 @@ with twi.I2CMaster() as twibus :
 		
 		if(senstype == VIS) :
 			comm = VIDAT
+			multi = 14.5	
 		elif(senstype == IR) :
 			comm = IRDAT
-			set_ir_range()
 			multi = 14.5
 		elif(senstype == UV) :
 			comm = UVDAT
@@ -167,14 +167,23 @@ with twi.I2CMaster() as twibus :
 				i2c_write(UCOEF[i], UCOVAL[i])
 
 		sensdata = i2c_read_more(comm[0], 2)
+		time.sleep(0.020)
 		sensword = ((sensdata[0][1] << 8) | sensdata[0][0])
 		
-		if(senstype != UV) :
-			sensword -= 256
-			if(sensword < 0) :
-				sensword = 0
-		elif(senstype == UV) :
+		if(senstype == UV) :
 			sensword /= 1450
+		elif(senstype == IR) :
+			if(sensword > 256) :
+				sensword -= 256
+			else :
+				sensword = 0
+
+		elif(senstype == VIS) :
+			if(sensword > 256) :
+				sensword -= 256
+			else :
+				sensword = 0
+			sensword *= 0.7
 
 		return sensword * multi		
 
@@ -223,14 +232,25 @@ with twi.I2CMaster() as twibus :
 		state = ram_command_read(RD_IRGAIN)
 		return state
 
-	
+	def ir_adc_counter(c) :
+		state = ram_command_write(WR_IRADCO, c)
+		state = ram_command_read(RD_IRADCO)	
+
+	def vis_adc_counter(c) :
+		state = ram_command_write(WR_VISADCO, c)
+		state = ram_command_read(RD_VISADCO)	
+
 	def init_sensor() :	
+		set_hardware_key()
 		set_measure_rate(0xff)
 		enable_als()
-		visible_gain(0x00)
+		visible_gain(0x03)
 		irda_gain(0x00)
+		vis_adc_counter(0x70)
+		ir_adc_counter(0x70)
 		set_als_mode(ALSAUTO)		
-	
+		set_ir_range()
+		set_vis_range()
 
 #tool to store data in files per timestamp
 	def write_data_to(file = "") :
@@ -239,7 +259,7 @@ with twi.I2CMaster() as twibus :
 
 		if(file != "") :
 			filehandle = open(file, "a")
-			filehandle.write("time-%s-VIS-%6i-IR-%6i-UV-%3.1f\r\n" % (timestamp, 
+			filehandle.write("time+%s+VIS+%6i+IR+%6i+UV+%3.1f\r\n" % (timestamp, 
                                                                       read_sensor_data(VIS),
 			                                              read_sensor_data(IR),
                                                                       read_sensor_data(UV)))
