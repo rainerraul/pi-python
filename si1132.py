@@ -166,7 +166,7 @@ with twi.I2CMaster() as twibus :
 			for i in range(4) :	
 				i2c_write(UCOEF[i], UCOVAL[i])
 
-		sensdata = i2c_read_more(comm[0], 2)
+		sensdata = i2c_read_more(comm, 2)
 		time.sleep(0.020)
 		sensword = ((sensdata[0][1] << 8) | sensdata[0][0])
 		
