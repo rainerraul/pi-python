@@ -71,7 +71,7 @@ with twowire.I2CMaster() as bussystem :
 		
 		for i in range(0, 11) :
 			if(((Cal[i] & 0x8000) == 0x8000)) :
-				Cal[i] = 65535 - Cal[i]
+				Cal[i] = 65536 - Cal[i]
 				Cal[i] = Cal[i] * (- 1)
 
 			calfile.write("%i" % Cal[i])
