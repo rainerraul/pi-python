@@ -1,4 +1,4 @@
-##!/usr/bin/python3
+#!/usr/bin/python3
 
 import quick2wire.i2c as twowire
 import sys, math, os, time
@@ -108,7 +108,7 @@ with twowire.I2CMaster() as bussystem :
 		X2 = ((caldata[9] * (2 ** 11)) / (X1 + caldata[10]))
 		B5 = X1 + X2
 		adctemp = (B5 + 8) / 16			
-		temp = [int(adctemp) / 10, adcword]
+		temp = [(adctemp / 10) - 2, adcword]
 		return temp
 
 	def bmp180_readPressure(conversionTime)  :
@@ -160,14 +160,31 @@ with twowire.I2CMaster() as bussystem :
 
 		if(file != "") :
 			filehandle = open(file, "a")
-			filehandle.write("time-%s-temp-%s-pressure-%s\r\n" %(timestamp, 
-			bmp180_readTemp()[0], bmp180_readPressure(conversion_13m5)))
+			bmp180temp = bmp180_readTemp()[0]
+
+			if bmp180temp < 0 :
+				sign = "neg"
+			elif bmp180temp >= 0 :
+				sign = "pos"
+
+			filehandle.write("time+%s+temp+%3.1f+pressure+%5i+sign+%s\r\n" %(timestamp, bmp180temp, bmp180_readPressure(conversion_13m5), sign))
 			filehandle.close()
 
 		else :
-			print("Temperatur: %3.1f-Pressure: %6.1f" %(bmp180_readTemp(), 
-			bmp180_readPressure(conversion_13m5)))
+			print("Temperatur: %3.1f-Pressure: %6.1f" %(bmp180_readTemp(), bmp180_readPressure(conversion_13m5)))
 
 	bmp180_writeParams_toFile()
 	write_data_to("/var/www/wetter/bmp180.dat")
+
+	
+
+
+
+
+
+
+
+
+
+
 
