@@ -171,7 +171,7 @@ with twi.I2CMaster() as twibus :
 		sensword = ((sensdata[0][1] << 8) | sensdata[0][0])
 		
 		if(senstype == UV) :
-			sensword /= 1450
+			sensword /= 100
 		elif(senstype == IR) :
 			if(sensword > 256) :
 				sensword -= 256
@@ -183,7 +183,7 @@ with twi.I2CMaster() as twibus :
 				sensword -= 256
 			else :
 				sensword = 0
-			sensword *= 0.7
+			#sensword *= 0.7
 
 		return sensword * multi		
 
