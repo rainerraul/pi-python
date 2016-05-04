@@ -52,7 +52,7 @@ WR_VISADCO = PSET | VISADCO
 
 #some constants
 VIS = 0; IR = 1; UV = 2
-UCOVAL = [0x29, 0x89, 0x02, 0x00]
+UCOVAL = [0x7b, 0x6b, 0x01, 0x00]
 
 with twi.I2CMaster() as twibus :
 #i2c routines
