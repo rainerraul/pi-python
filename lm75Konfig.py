@@ -67,8 +67,7 @@ with twi.I2CMaster() as connector:
 			thosvalue = float(sys.argv[2])
 			writeTemp(thystvalue, thyst)
 			writeTemp(thosvalue, tos)
-     
-		temp1 = readTemp(thyst);
+     		temp1 = readTemp(thyst);
 		temp2 = readTemp(tos)
 		temp3 = readTemp(real)
 		print("thyst:" + str(temp1) + ":tos:" + str(temp2) + ":ist:" + str(temp3))
@@ -79,5 +78,5 @@ with twi.I2CMaster() as connector:
 		temp2 = readTemp(tos)
 		temp3 = readTemp(real)	
 		print("thyst:" + str(temp1) + ":tos:" + str(temp2) + ":ist:" + str(temp3))
-		print(":Bitte Argumente in folgender Reihenfolge eingeben: lm75Konfig.py Thyst Thos");
+		print("Please put args in following order: lm75Konfig.py Thyst Thos");
 		pass
