@@ -9,4 +9,4 @@ open a ssh-shell and type: <font color="red"><b><p style="font-color:red">lcdpri
 sensor devices, that are connected on the same i2c bus, where the LCD-Display is.<br>
 (19 11 2016)<br>
 The sht31 humidity sensor from Sensirion runs without crc(byte3 and byte6 are the checksum bytes). Since i start datalogging the<br> sensor have not fail and works fine.<br>
-LM75 is a sensor, that measure temperature and drive an open collector outlet. Also you can configurate a hysteresis value and a<br> maximum temperature value. The outlet is high, when current temperature is over its maximum and low, when the current is<br> under the hysteresis value. It acts like a thermostate for heating.
+LM75 is a sensor, that measure temperature and drive an open collector outlet. Also you can configurate a hysteresis value and a<br> maximum temperature value. The outlet is high, when current temperature is over its maximum and low, when the current<br> temperature is under the hysteresis value. It acts like a thermostate for heating.
