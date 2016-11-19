@@ -30,10 +30,10 @@ with twi.I2CMaster() as connector:
 			temperatur = ((temp[0][0] << 1)) + ((temp[0][1] & 0x80) >> 7)
 	
 			if (signFlag == 1):
-				temperatur *= (-1)
+				temperature *= (-1)
 		
-			temperatur = temperatur / 2.0
-			return temperatur
+			temperature = temperature / 2.0
+			return temperature
 
 		def writeTemp( tempval, mode ):
 			highbyte = 0
