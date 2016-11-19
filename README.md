@@ -5,7 +5,7 @@ The programming of these sensors on the weatherboard are complete. The next thin
 to be continued...<br>
 <b>(10 06 2015)</b><br>
 Added a python-script called lcdprint. You can send a message to a twi-interfaced YuroBot display 4x20.
-open a ssh-shell and type: <font color="red"><b><p style="font-color:red">lcdprint linenumber(0-3) "Hello Message".</p></b></font> Use this python-file to display data from
+open a ssh-shell and type: <font><b><p style="font-color:red">lcdprint linenumber(0-3) "Hello Message".</p></b></font> Use this python-file to display data from
 sensor devices, that are connected on the same i2c bus, where the LCD-Display is.<br>
 <b>(19 11 2016)</b><br>
 The sht31 humidity sensor from Sensirion runs without crc(byte3 and byte6 are the checksum bytes). Since i start datalogging the<br> sensor have not fail and works fine.<br>
