@@ -10,4 +10,5 @@ sensor devices, that are connected on the same i2c bus, where the LCD-Display is
 <b>(19 11 2016)</b><br>
 The sht31 humidity sensor script from Sensirion runs without checking the crc bytes(byte3 and byte6 are the checksum bytes).<br> Since i start datalogging the sensor have not fail and works fine.<br>
 LM75 is a sensor, that measure temperature and drive an open collector outlet. Also you can configurate a hysteresis value and a <br>
-maximum temperature value. The outlet is high, when current temperature is over its maximum and low, when the current<br> temperature is under the hysteresis value. It acts like a thermostate for heating.
+maximum temperature value. The outlet is high, when current temperature is over its maximum and low, when the current<br>
+temperature is under the hysteresis value. It acts like a thermostate for heating.
