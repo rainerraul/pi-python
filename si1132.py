@@ -54,7 +54,7 @@ WR_VISADCO = PSET | VISADCO
 VIS = 0; IR = 1; UV = 2
 UCOVAL = [0x7b, 0x6b, 0x01, 0x00]
 
-with twi.I2CMaster() as twibus :
+with twi.I2CMaster(1) as twibus :
 #i2c routines
 	def i2c_read(reg) :
 		readvalue = twibus.transaction(twi.writing_bytes(slave, reg), twi.reading(slave, 1))
@@ -152,46 +152,59 @@ with twi.I2CMaster() as twibus :
 		return i2c_read(IRSTA) & 0x21
 
 	def read_sensor_data(senstype) :
+		global multi
+		global sensword
+
 		multi = 1
+		sensword = 0
 		
 		if(senstype == VIS) :
 			comm = VIDAT
-			multi = 14.5	
+			#multi = 14.5 / 0.282
 		elif(senstype == IR) :
 			comm = IRDAT
-			multi = 14.5
+			#multi = 14.5 * 0.41
 		elif(senstype == UV) :
 			comm = UVDAT
 
-			for i in range(4) :	
-				i2c_write(UCOEF[i], UCOVAL[i])
-
-		sensdata = i2c_read_more(comm[0], 2)
-		time.sleep(0.020)
-		sensword = ((sensdata[0][1] << 8) | sensdata[0][0])
 		
+		sensdata = i2c_read_more(comm[0], 2)
+		sensword = (sensdata[0][1] << 8) | sensdata[0][0]		
+
 		if(senstype == UV) :
 			sensword /= 100
 		elif(senstype == IR) :
 			if(sensword > 256) :
 				sensword -= 256
+				sensword *= 14.5
 			else :
 				sensword = 0
 
 		elif(senstype == VIS) :
 			if(sensword > 256) :
 				sensword -= 256
+				sensword *= 14.5
 			else :
 				sensword = 0
-			#sensword *= 0.7
 
-		return sensword * multi		
+		return sensword		
 
 	def chip_state() :
 		state = i2c_read(CHSTAT) & 0x07
 		return state
 
 #ram command functions
+
+	def reset_ir_adcmux() :
+		state = ram_command_write(WR_IRADMUX, 0x00)
+		state = ram_command_read(RD_IRADMUX)
+		return state
+	
+	def set_aux_mux() :
+		state = ram_command_write(WR_AUXMUX, 0x65)
+		state = ram_command_read(RD_AUXMUX)
+		return state
+
 	def set_ir_range() :
 		state = ram_command_write(WR_IRMISC, 0x20)
 		state = ram_command_read(RD_IRMISC)
@@ -239,16 +252,24 @@ with twi.I2CMaster() as twibus :
 	def vis_adc_counter(c) :
 		state = ram_command_write(WR_VISADCO, c)
 		state = ram_command_read(RD_VISADCO)	
-
+	
 	def init_sensor() :	
+
+		for i in range(4) :	
+			i2c_write(UCOEF[i], UCOVAL[i])
+
+
 		set_hardware_key()
-		set_measure_rate(0xff)
+		set_measure_rate(0x080a)
+	
 		enable_als()
-		visible_gain(0x03)
+		visible_gain(0x00)
 		irda_gain(0x00)
 		vis_adc_counter(0x70)
 		ir_adc_counter(0x70)
 		set_als_mode(ALSAUTO)		
+		reset_ir_adcmux()
+		set_aux_mux()
 		set_ir_range()
 		set_vis_range()
 
@@ -259,10 +280,19 @@ with twi.I2CMaster() as twibus :
 
 		if(file != "") :
 			filehandle = open(file, "a")
-			filehandle.write("time+%s+VIS+%6i+IR+%6i+UV+%3.1f\r\n" % (timestamp, 
+			lux = 0
+			uvindex = 0
+
+			uvindex = read_sensor_data(UV) / 1
+	
+			
+			lux = (read_sensor_data(VIS) * 6.33) + (read_sensor_data(IR) * - 0.094)
+
+			filehandle.write("time+%s+VIS+%6.1f+IR+%6.1f+UV+%3.1f+LUX+%6.1f\r\n" % (timestamp, 
                                                                       read_sensor_data(VIS),
 			                                              read_sensor_data(IR),
-                                                                      read_sensor_data(UV)))
+                                                                      uvindex, 
+								      lux))
 			filehandle.close()
 
 		else :
